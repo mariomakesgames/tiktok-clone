@@ -17,6 +17,11 @@ export default {
       },
     },
     {
+      name: 'videoUrl',
+      title: 'Uploaded video URL',
+      type: 'url',
+    },
+    {
       name: 'userId',
       title: 'UserId',
       type: 'string',

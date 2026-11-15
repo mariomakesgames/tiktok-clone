@@ -1,12 +1,9 @@
 export const getAllPostsByLimit = (userId: string) => {
-  const query = `*[_type == "post"] | order(_createdAt desc) [1...10] {
+  const query = `*[_type == "post"] | order(_createdAt desc) [0...9] {
     _id,
      caption,
-       video{
-        asset->{
-          _id,
-          url
-        }
+       "video": {
+        "asset": coalesce(video.asset->{_id, url}, {"_id": _id, "url": videoUrl})
       },
       userId,
       postedBy->{
@@ -39,11 +36,8 @@ export const postDetailQuery = (postId: string | string[], userId: string) => {
   const query = `*[_type == "post" && _id == '${postId}']{
     _id,
      caption,
-       video{
-        asset->{
-          _id,
-          url
-        }
+       "video": {
+        "asset": coalesce(video.asset->{_id, url}, {"_id": _id, "url": videoUrl})
       },
       userId,
     postedBy->{
@@ -81,11 +75,8 @@ export const searchPostsQuery = (searchTerm: string | string[]) => {
   const query = `*[_type == "post" && caption match '${searchTerm}*' || topic match '${searchTerm}*'] {
     _id,
      caption,
-       video{
-        asset->{
-          _id,
-          url
-        }
+       "video": {
+        "asset": coalesce(video.asset->{_id, url}, {"_id": _id, "url": videoUrl})
       },
     userId,
     postedBy->{
@@ -119,12 +110,9 @@ export const userCreatedPostsQuery = (userId: string | string[]) => {
   const query = `*[ _type == 'post' && userId == '${userId}'] | order(_createdAt desc){
     _id,
     caption,
-      video{
-       asset->{
-         _id,
-         url
-       }
-     },
+      "video": {
+        "asset": coalesce(video.asset->{_id, url}, {"_id": _id, "url": videoUrl})
+      },
      userId,
      postedBy->{
        _id,
@@ -144,11 +132,8 @@ export const userLikedPostsQuery = (userId: string | string[]) => {
   const query = `*[_type == 'post' && '${userId}' in likes[]._ref ] | order(_createdAt desc) {
     _id,
      caption,
-       video{
-        asset->{
-          _id,
-          url
-        }
+       "video": {
+        "asset": coalesce(video.asset->{_id, url}, {"_id": _id, "url": videoUrl})
       },
       userId,
     postedBy->{
@@ -164,14 +149,11 @@ export const userLikedPostsQuery = (userId: string | string[]) => {
 };
 
 export const topicPostsQuery = (topic: string | string[], userId: string) => {
-  const query = `*[_type == "post" && topic match '${topic}*'] | order(_createdAt desc) [1...10] {
+  const query = `*[_type == "post" && topic match '${topic}*'] | order(_createdAt desc) [0...9] {
     _id,
      caption,
-       video{
-        asset->{
-          _id,
-          url
-        }
+       "video": {
+        "asset": coalesce(video.asset->{_id, url}, {"_id": _id, "url": videoUrl})
       },
       userId,
       postedBy->{

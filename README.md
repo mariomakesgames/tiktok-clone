@@ -73,6 +73,10 @@ To run this project, you will need to add the following environment variables to
 
 `NEXTAUTH_URL` - (`http://localhost:3000`)
 
+`NEXTAUTH_SECRET` - (a random server-side session secret)
+
+`BLOB_READ_WRITE_TOKEN` - (the server-side token for a public Vercel Blob store)
+
 ### Create sanity studio
 
 Firstly, follow the instructions from sanity's official documentation
@@ -120,7 +124,7 @@ And then, you can view sanity studio on [http://localhosts:3333](http://localhos
 
 Get your `TOKEN` and `PROJECTID` from sanity studio
 
-`NEXT_PUBLIC_SANITY_TOKEN` - (`your sanity token`)
+`SANITY_API_TOKEN` - (a server-side token with document write access)
 
 `NEXT_PUBLIC_SANITY_PROJECT_ID` - (`your sanity projectId`)
 

@@ -1,14 +1,14 @@
 import Head from 'next/head';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 import SelectTopic from '../components/SelectTopic';
-import { client } from '../utils/client';
+import { upload } from '@vercel/blob/client';
+import { nanoid } from 'nanoid';
+import { MAX_VIDEO_BYTES, VIDEO_CONTENT_TYPES } from '../utils/video-upload';
 import { useEffect, useState } from 'react';
-import { SanityAssetDocument } from '@sanity/client';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import axios from 'axios';
-import { ROOT_URL } from '../utils';
 
 interface Event<T = EventTarget> {
   target: T;
@@ -20,81 +20,73 @@ export default function Upload() {
   const { data: user, status }: any = useSession();
   const router = useRouter();
 
-  const [videoAsset, setVideoAsset] = useState<SanityAssetDocument | null>(
-    null,
-  );
+  const [videoAsset, setVideoAsset] = useState<{
+    url: string;
+    pathname: string;
+  } | null>(null);
   const [caption, setCaption] = useState('');
   const [selectedTopic, setSelectedTopic] = useState(noTopic);
   const [isUploading, setIsUploading] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
-  const [isLargeFile, setIsLargeFile] = useState({ message: '' });
+  const [errorMessage, setErrorMessage] = useState('');
 
   async function uploadFile(e: Event<HTMLInputElement>) {
-    const selectedFile = e.target.files![0] as File;
-    const fileTypes = ['video/mp4', 'video/webm'];
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile || !user?._id || isUploading) return;
+    e.target.value = '';
+    setErrorMessage('');
 
-    if (selectedFile && fileTypes.includes(selectedFile.type)) {
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        setIsLargeFile({ message: 'file size should not exceed 10MB' });
-        return;
-      } else {
-        setIsLargeFile({ message: '' });
-      }
+    if (!VIDEO_CONTENT_TYPES.includes(selectedFile.type)) {
+      setErrorMessage('Choose an MP4 or WebM video.');
+      return;
+    }
+    if (!selectedFile.size || selectedFile.size > MAX_VIDEO_BYTES) {
+      setErrorMessage('Video must be between 1 byte and 10 MB.');
+      return;
+    }
 
-      setIsUploading(true);
-
-      try {
-        const video = await client.assets.upload('file', selectedFile, {
-          contentType: selectedFile.type,
-          filename: selectedFile.name,
-        });
-
-        setVideoAsset(video);
-        setIsUploading(false);
-      } catch (error) {
-        setIsUploading(false);
-        console.log(error);
-      }
+    setIsUploading(true);
+    try {
+      const extension = selectedFile.type === 'video/mp4' ? 'mp4' : 'webm';
+      const pathname = `videos/${user._id}/${nanoid()}.${extension}`;
+      const video = await upload(pathname, selectedFile, {
+        access: 'public',
+        contentType: selectedFile.type,
+        handleUploadUrl: '/api/post/upload',
+      });
+      setVideoAsset(video);
+    } catch {
+      setErrorMessage('Could not upload the video. Try again.');
+    } finally {
+      setIsUploading(false);
     }
   }
 
   async function handleUpload() {
-    if (!caption || !videoAsset) return;
+    if (!caption.trim() || !videoAsset || isPosting) return;
 
     setIsPosting(true);
-
-    const doc = {
-      _type: 'post',
-      caption,
-      video: {
-        _type: 'file',
-        asset: {
-          _type: 'reference',
-          _ref: videoAsset._id,
-        },
-      },
-      userId: user?._id,
-      postedBy: {
-        _type: 'postedBy',
-        _ref: user?._id,
-      },
-      topic: selectedTopic.name === 'No Topic' ? '' : selectedTopic.name,
-    };
-
-    await axios.post(`${ROOT_URL}/api/post`, doc);
-
-    handleDiscard();
-
-    router.push('/');
-
-    setIsPosting(false);
+    setErrorMessage('');
+    try {
+      await axios.post('/api/post', {
+        caption,
+        pathname: videoAsset.pathname,
+        topic: selectedTopic.name === 'No Topic' ? '' : selectedTopic.name,
+      });
+      handleDiscard();
+      void router.push('/');
+    } catch {
+      setErrorMessage('Could not publish the video. Try again.');
+    } finally {
+      setIsPosting(false);
+    }
   }
 
   function handleDiscard() {
     setVideoAsset(null);
     setCaption('');
     setSelectedTopic(noTopic);
-    setIsPosting(false);
+    setErrorMessage('');
   }
 
   useEffect(() => {
@@ -165,7 +157,7 @@ export default function Upload() {
                   <p className='mb-2 text-sm'>MP4 or WebM</p>
                   <p className='mb-2 text-sm'>720x1280 resolution or higher</p>
                   <p className='mb-2 text-sm'>Up to 30 minutes</p>
-                  <p className='mb-6 text-sm'>Less than 10 MB</p>
+                  <p className='mb-6 text-sm'>Up to 10 MB</p>
                   <p className='btn-primary w-4/5 py-2 text-center'>
                     Select file
                   </p>
@@ -176,13 +168,7 @@ export default function Upload() {
                     className='h-0 w-0'
                     onChange={uploadFile}
                   />
-                  {isLargeFile ? (
-                    <p className='mt-4 text-center text-sm font-semibold text-red-500'>
-                      {isLargeFile.message}
-                    </p>
-                  ) : (
-                    ''
-                  )}
+
                 </>
               )}
             </label>
@@ -219,13 +205,19 @@ export default function Upload() {
                 <button
                   onClick={handleUpload}
                   className='btn-primary w-36 py-2 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-darkBtnHover dark:disabled:text-gray-500'
-                  disabled={!caption || !videoAsset || isPosting}
+                  disabled={!caption.trim() || !videoAsset || isPosting}
                 >
                   {isPosting ? 'Posting...' : 'Post'}
                 </button>
               </div>
             </div>
           </div>
+
+          {errorMessage && (
+            <p role='alert' className='mt-4 text-sm font-semibold text-red-500'>
+              {errorMessage}
+            </p>
+          )}
 
           {/* mobile layout */}
           <div className='mt-10 flex items-center justify-center gap-4 xs:mt-12 md:hidden'>
@@ -240,7 +232,7 @@ export default function Upload() {
             <button
               onClick={handleUpload}
               className='btn-primary w-36 py-2 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:disabled:bg-darkBtnHover dark:disabled:text-gray-500'
-              disabled={!caption || !videoAsset || isPosting}
+              disabled={!caption.trim() || !videoAsset || isPosting}
             >
               {isPosting ? 'Posting...' : 'Post'}
             </button>

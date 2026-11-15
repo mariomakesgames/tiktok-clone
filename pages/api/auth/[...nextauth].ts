@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { client } from '../../../utils/client';
+import { sanityWriter } from '../../../utils/sanity-server';
 
 export const AUTH_OPTIONS = {
   // Configure one or more authentication providers
@@ -10,18 +10,28 @@ export const AUTH_OPTIONS = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  secret: 'zwel',
+  secret: process.env.NEXTAUTH_SECRET,
+  session: { strategy: 'jwt' },
   callbacks: {
-    async session({ token }): Promise<any> {
-      const userInfo = {
-        _id: token?.sub!,
+    async jwt({ token, account }) {
+      if (account && token.sub) {
+        await sanityWriter().createIfNotExists({
+          _id: token.sub,
+          _type: 'user',
+          userName: token.name,
+          image: token.picture,
+        });
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      return {
+        ...session,
+        _id: token.sub!,
         _type: 'user',
-        userName: token?.name!,
-        image: token?.picture!,
+        userName: token.name!,
+        image: token.picture!,
       };
-
-      await client.createIfNotExists(userInfo);
-      return userInfo;
     },
   },
 } satisfies NextAuthOptions;

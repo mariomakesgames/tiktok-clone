@@ -5,6 +5,4 @@ export const client = createClient({
   dataset: 'production',
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION,
   useCdn: false,
-  token: process.env.NEXT_PUBLIC_SANITY_TOKEN,
-  ignoreBrowserTokenWarning: true,
 });
