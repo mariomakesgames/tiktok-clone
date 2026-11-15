@@ -1,5 +1,5 @@
 import PopularTopics from './PopularTopics';
-import { RiGithubFill, RiHomeSmileFill } from 'react-icons/ri';
+import { RiHomeSmileFill } from 'react-icons/ri';
 import SuggestedAccounts from './SuggestedAccounts';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -42,23 +42,13 @@ export default function Sidebar() {
           />
         )}
 
-        <div className='mb-3 flex items-center gap-2'>
+        <div className='mb-3 lg:hidden'>
           <button
             onClick={toggleSidebarDrawer}
             className='mr-auto flex items-center justify-center rounded p-1 transition-colors hover:bg-gray-100 dark:hover:bg-darkBtnHover lg:hidden'
           >
             <BiMenuAltLeft size={30} />
           </button>
-
-          <Link
-            href='https://github.com/zwelhtetyan/tiktok-clone'
-            target='_blank'
-            aria-label='Home'
-            className='flex max-w-[150px] items-center justify-center rounded-md bg-primary p-1 text-sm text-white hover:bg-primary/90 dark:border-darkSecondary dark:bg-darkBtn dark:hover:bg-darkBtnHover'
-          >
-            <RiGithubFill size={22} />
-            <p className='ml-2'>Stars on Github</p>
-          </Link>
         </div>
 
         <div className='flex gap-2'>

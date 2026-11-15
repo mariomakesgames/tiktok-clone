@@ -41,7 +41,7 @@ export default function SelectTopic({
                 className={({ active }) =>
                   `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
                     active
-                      ? 'bg-pink-200 dark:bg-darkBtnHover'
+                      ? 'bg-violet-200 dark:bg-darkBtnHover'
                       : 'text-gray-900 dark:text-gray-100'
                   }`
                 }

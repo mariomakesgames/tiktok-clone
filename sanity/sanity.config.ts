@@ -5,7 +5,7 @@ import {schemaTypes} from './schemas'
 
 export default defineConfig({
   name: 'default',
-  title: 'TitTok-clone',
+  title: 'Robloxtok Admin',
 
   projectId: '2qv2ei73',
   dataset: 'production',

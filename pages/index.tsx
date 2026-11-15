@@ -16,8 +16,8 @@ import { closeSidebar } from '../utils/sidebar-drawer';
 
 const metadata = {
   description:
-    'TikTok, also known in China as Douyin, is a short-form video hosting service owned by the Chinese company ByteDance. It hosts user-submitted videos, which can range in duration from 3 seconds to 10 minutes.',
-  title: 'TikTok - Make Your Day',
+    'Watch and share short videos on Robloxtok.',
+  title: 'Robloxtok',
 };
 
 interface Props {
@@ -104,16 +104,15 @@ export default function Home({ videos }: Props) {
         <title>{metadata.title}</title>
         <meta name='description' content={metadata.description} />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <link rel='icon' href='/favicon.ico' />
         <meta property='og:title' content={metadata.title} />
         <meta property='og:description' content={metadata.description} />
         <meta
           property='og:url'
-          content='https://tiktok-clone-zhy.vercel.app/'
+          content={`${ROOT_URL}/`}
         ></meta>
         <meta
           property='og:image'
-          content='https://dev-to-uploads.s3.amazonaws.com/uploads/articles/kdb7qa7aav7vww7ayiki.png'
+          content={`${ROOT_URL}/robloxtok-share.png`}
         />
       </Head>
 

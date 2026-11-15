@@ -32,7 +32,7 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <NextNProgress
-        color='rgb(254 44 85)'
+        color='#7c3aed'
         startPosition={0.1}
         stopDelayMs={100}
         height={3}

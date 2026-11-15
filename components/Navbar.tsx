@@ -1,13 +1,11 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { CgMathPlus } from 'react-icons/cg';
 import { IoSearchOutline } from 'react-icons/io5';
 import { signIn, useSession } from 'next-auth/react';
 import User from './User';
-import LogoLight from '../utils/LogoLight';
-import LogoDark from '../utils/LogoDark';
 import { FormEvent, useRef } from 'react';
 import { useRouter } from 'next/router';
-import useStore from '../store';
 import { BiMenuAltLeft } from 'react-icons/bi';
 import { toggleSidebarDrawer } from '../utils/sidebar-drawer';
 
@@ -18,7 +16,6 @@ type Props = {
 export default function Navbar({ hasSidebar }: Props) {
   const { data: user }: any = useSession();
 
-  const { theme } = useStore();
   const router = useRouter();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -38,10 +35,11 @@ export default function Navbar({ hasSidebar }: Props) {
       <div className='mx-auto flex w-full items-center justify-between gap-4 px-2 py-2 lg:px-4'>
         <Link
           href='/'
-          aria-label='TikTok_logo'
-          className={`${!hasSidebar ? 'block' : 'hidden lg:block'} `}
+          aria-label='Robloxtok home'
+          className={`${!hasSidebar ? 'flex' : 'hidden lg:flex'} shrink-0 items-center gap-2`}
         >
-          {theme === 'dark' ? <LogoDark /> : <LogoLight />}
+          <Image src='/robloxtok.svg' alt='' width={32} height={32} />
+          <span className='text-lg font-semibold'>Robloxtok</span>
         </Link>
 
         {hasSidebar && (

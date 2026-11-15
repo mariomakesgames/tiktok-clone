@@ -71,30 +71,6 @@ export default function User() {
                 </button>
               )}
             </Menu.Item>
-            {/* <Menu.Item>
-              {({ active }) => (
-                <button
-                  className={`${
-                    active && "bg-gray-200 dark:bg-darkSecondary"
-                  } text-gray-800 dark:text-gray-200 group flex justify-between w-full items-center rounded-md px-2 py-2`}
-                  onClick={() => {
-                    window.open(
-                      "https://github.com/zwelhtetyan/tiktok-clone",
-                      "_blank"
-                    );
-                  }}
-                >
-                  <p className="flex items-center">
-                    Give{" "}
-                    <TiStar
-                      className="inline-block ml-1 text-primary"
-                      size={20}
-                    />
-                  </p>
-                  <FaGithubAlt size={20} />
-                </button>
-              )}
-            </Menu.Item> */}
             <Menu.Item>
               {({ active }) => (
                 <button

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: 'Robloxtok Admin',
+  icons: { icon: '/robloxtok.svg', apple: '/robloxtok-192.png' },
   robots: { index: false, follow: false },
 };
 

@@ -5,7 +5,8 @@ export default function Document() {
     <Html lang='en'>
       <Head>
         <link rel='manifest' href='/manifest.json' />
-        <link rel='apple-touch-icon' href='/icon-192x192.png' />
+        <link rel='icon' type='image/svg+xml' href='/robloxtok.svg' />
+        <link rel='apple-touch-icon' href='/robloxtok-192.png' />
         <meta name='theme-color' content='#121212' />
       </Head>
       <body>

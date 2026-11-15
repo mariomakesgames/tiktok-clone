@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import axios from 'axios';
+import { ROOT_URL } from '../utils';
 
 interface Event<T = EventTarget> {
   target: T;
@@ -100,10 +101,10 @@ export default function Upload() {
   return (
     <Layout>
       <Head>
-        <title>Upload | Tik Tok</title>
+        <title>Upload | Robloxtok</title>
         <meta
           property='og:url'
-          content='https://tiktok-clone-zhy.vercel.app/upload'
+          content={`${ROOT_URL}/upload`}
         ></meta>
       </Head>
 
