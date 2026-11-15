@@ -9,11 +9,15 @@ const AdminStudio = dynamic(
       { structureTool },
       { visionTool },
       { schemaTypes },
+      { topicDocumentOptions, topicStructure },
+      { default: topicSchema },
     ] = await Promise.all([
       import('sanity'),
       import('sanity/structure'),
       import('@sanity/vision'),
       import('../../../sanity/schemas'),
+      import('../topic-structure'),
+      import('../topic-schema'),
     ]);
 
     const config = defineConfig({
@@ -22,8 +26,9 @@ const AdminStudio = dynamic(
       basePath: '/admin',
       projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
       dataset: 'production',
-      plugins: [structureTool(), visionTool()],
-      schema: { types: schemaTypes },
+      plugins: [structureTool({ structure: topicStructure }), visionTool()],
+      document: topicDocumentOptions,
+      schema: { types: [...schemaTypes, topicSchema] },
     });
 
     return function AdminStudio() {

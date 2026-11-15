@@ -1,6 +1,8 @@
 import { ReactNode } from 'react';
 import { topics } from '../utils/constants';
 import { useRouter } from 'next/router';
+import { HiOutlineHashtag } from 'react-icons/hi2';
+import useTopics from '../hooks/useTopics';
 
 interface TopicProp {
   topic: { name: string; icon: ReactNode };
@@ -11,7 +13,7 @@ function Topic({ topic }: TopicProp) {
   const activeTopic = router.query.topic;
 
   const clickTopicHandler = (topicName: string) =>
-    router.push(`/?topic=${topicName}`);
+    router.push({ pathname: '/', query: { topic: topicName } });
 
   return (
     <button
@@ -30,6 +32,9 @@ function Topic({ topic }: TopicProp) {
 }
 
 export default function PopularTopics() {
+  const { data: publishedTopics } = useTopics();
+  if (!publishedTopics?.length) return null;
+
   return (
     <div className='mb-2'>
       <h2 className='mb-3 font-semibold text-gray-500 dark:text-gray-400'>
@@ -37,8 +42,15 @@ export default function PopularTopics() {
       </h2>
 
       <div className='flex flex-wrap gap-2'>
-        {topics.map((topic) => (
-          <Topic key={topic.name} topic={topic} />
+        {publishedTopics.map((name) => (
+          <Topic
+            key={name}
+            topic={{
+              name,
+              icon: topics.find((topic) => topic.name === name.toLowerCase())?.icon ??
+                <HiOutlineHashtag size={20} aria-hidden='true' />,
+            }}
+          />
         ))}
       </div>
     </div>

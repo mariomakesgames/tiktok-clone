@@ -4,23 +4,19 @@ import { topicPostsQuery } from '../../../../utils/queries';
 import { Video } from '../../../../types';
 import { client } from '../../../../utils/client';
 
-type Data = {
-  data: Video[] | [];
-};
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Video[]>,
 ) {
   if (req.method === 'GET') {
     const currentUserId = (req.query.currentUserId as string) || '';
 
-    const topic = req.query.topic!;
-
-    const query = topicPostsQuery(topic, currentUserId);
-
-    const data: { data: Video[] } = await client.fetch(query);
-
+    const { topic } = req.query;
+    if (typeof topic !== 'string') return res.status(400).end();
+    const data = await client.fetch<Video[]>(topicPostsQuery, {
+      topic,
+      currentUserId,
+    });
     res.status(200).json(data);
   }
 }

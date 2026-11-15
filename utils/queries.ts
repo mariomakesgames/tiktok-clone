@@ -148,8 +148,7 @@ export const userLikedPostsQuery = (userId: string | string[]) => {
   return query;
 };
 
-export const topicPostsQuery = (topic: string | string[], userId: string) => {
-  const query = `*[_type == "post" && topic match '${topic}*'] | order(_createdAt desc) [0...9] {
+export const topicPostsQuery = `*[_type == "post" && lower(topic) == lower($topic)] | order(_createdAt desc) [0...9] {
     _id,
      caption,
        "video": {
@@ -162,10 +161,10 @@ export const topicPostsQuery = (topic: string | string[], userId: string) => {
         image,
         follower,
         following,
-        "isFollowed": "${userId}" in follower[]._ref,
+        "isFollowed": $currentUserId in follower[]._ref,
       },
     likes,
-    "isLiked": "${userId}" in likes[]._ref,
+    "isLiked": $currentUserId in likes[]._ref,
     "totalLikes": count(likes),
     comments[]{
       comment,
@@ -178,6 +177,3 @@ export const topicPostsQuery = (topic: string | string[], userId: string) => {
     },
     _createdAt,
   }`;
-
-  return query;
-};

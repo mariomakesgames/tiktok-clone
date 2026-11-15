@@ -158,9 +158,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const currentUserId = session?._id;
 
   // query videos
-  if (topic) {
+  if (typeof topic === 'string' && topic) {
     const { data } = await axios.get(
-      `${ROOT_URL}/api/post/discover/${topic}?currentUserId=${currentUserId}`,
+      `${ROOT_URL}/api/post/discover/${encodeURIComponent(topic)}`,
+      { params: { currentUserId } },
     );
     videos = data;
   } else {

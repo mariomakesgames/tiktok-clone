@@ -6,6 +6,7 @@ import { Video } from '../../../types';
 import { BlobNotFoundError, head } from '@vercel/blob';
 import { requireUser } from '../../../utils/api-auth';
 import { sanityWriter } from '../../../utils/sanity-server';
+import { getPublishedTopics } from '../../../utils/published-topics';
 import {
   isOwnedVideoPath,
   MAX_VIDEO_BYTES,
@@ -37,6 +38,10 @@ export default async function handler(
       typeof pathname !== 'string' || !isOwnedVideoPath(pathname, userId)
     ) {
       return res.status(400).json({ message: 'Invalid video or caption.' });
+    }
+
+    if (topic && !(await getPublishedTopics()).includes(topic)) {
+      return res.status(409).json({ message: 'This topic is no longer available.' });
     }
 
     const blob = await head(pathname).catch((error: unknown) => {

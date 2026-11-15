@@ -14,8 +14,6 @@ interface Event<T = EventTarget> {
   target: T;
 }
 
-const noTopic = { name: 'No Topic', icon: '' };
-
 export default function Upload() {
   const { data: user, status }: any = useSession();
   const router = useRouter();
@@ -25,7 +23,7 @@ export default function Upload() {
     pathname: string;
   } | null>(null);
   const [caption, setCaption] = useState('');
-  const [selectedTopic, setSelectedTopic] = useState(noTopic);
+  const [selectedTopic, setSelectedTopic] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -71,12 +69,16 @@ export default function Upload() {
       await axios.post('/api/post', {
         caption,
         pathname: videoAsset.pathname,
-        topic: selectedTopic.name === 'No Topic' ? '' : selectedTopic.name,
+        topic: selectedTopic,
       });
       handleDiscard();
       void router.push('/');
-    } catch {
-      setErrorMessage('Could not publish the video. Try again.');
+    } catch (error) {
+      setErrorMessage(
+        axios.isAxiosError(error) && error.response?.status === 409
+          ? 'This topic is no longer available. Choose another topic.'
+          : 'Could not publish the video. Try again.',
+      );
     } finally {
       setIsPosting(false);
     }
@@ -85,7 +87,7 @@ export default function Upload() {
   function handleDiscard() {
     setVideoAsset(null);
     setCaption('');
-    setSelectedTopic(noTopic);
+    setSelectedTopic('');
     setErrorMessage('');
   }
 
