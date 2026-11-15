@@ -142,6 +142,13 @@ Please make sure you are in the root folder (`/tiktok-clone:`)
 
 Finally, you can view the app on [http://localhosts:3000](http://localhosts:3000)
 
+### Admin
+
+Open `/admin` on the app's domain to access Sanity Studio. It uses the same
+`NEXT_PUBLIC_SANITY_PROJECT_ID` and `production` dataset as the app. In Sanity
+Manage, add the app origin under **API → CORS origins** with **Allow credentials**
+enabled, then sign in with a Sanity account that has access to the project.
+
 <!-- Contributing -->
 
 <br />
