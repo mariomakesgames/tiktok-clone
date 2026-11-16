@@ -1,18 +1,17 @@
 import Head from 'next/head';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 import SelectTopic from '../components/SelectTopic';
-import { upload } from '@vercel/blob/client';
-import { nanoid } from 'nanoid';
+import { MAX_VIDEO_MB } from '../utils/video-upload';
 import {
-  MAX_VIDEO_BYTES,
-  MAX_VIDEO_MB,
-  VIDEO_CONTENT_TYPES,
-} from '../utils/video-upload';
+  publishVideo,
+  uploadVideo,
+  videoFileError,
+  videoPublishError,
+} from '../utils/video-publishing';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
-import axios from 'axios';
 import { ROOT_URL } from '../utils';
 
 interface Event<T = EventTarget> {
@@ -39,25 +38,15 @@ export default function Upload() {
     e.target.value = '';
     setErrorMessage('');
 
-    if (!VIDEO_CONTENT_TYPES.includes(selectedFile.type)) {
-      setErrorMessage('Choose an MP4 or WebM video.');
-      return;
-    }
-    if (!selectedFile.size || selectedFile.size > MAX_VIDEO_BYTES) {
-      setErrorMessage(`Video must be between 1 byte and ${MAX_VIDEO_MB} MB.`);
+    const error = videoFileError(selectedFile);
+    if (error) {
+      setErrorMessage(error);
       return;
     }
 
     setIsUploading(true);
     try {
-      const extension = selectedFile.type === 'video/mp4' ? 'mp4' : 'webm';
-      const pathname = `videos/${user._id}/${nanoid()}.${extension}`;
-      const video = await upload(pathname, selectedFile, {
-        access: 'public',
-        contentType: selectedFile.type,
-        handleUploadUrl: '/api/post/upload',
-      });
-      setVideoAsset(video);
+      setVideoAsset(await uploadVideo(selectedFile, user._id));
     } catch {
       setErrorMessage('Could not upload the video. Try again.');
     } finally {
@@ -71,19 +60,11 @@ export default function Upload() {
     setIsPosting(true);
     setErrorMessage('');
     try {
-      await axios.post('/api/post', {
-        caption,
-        pathname: videoAsset.pathname,
-        topic: selectedTopic,
-      });
+      await publishVideo(videoAsset.pathname, caption, selectedTopic);
       handleDiscard();
       void router.push('/');
     } catch (error) {
-      setErrorMessage(
-        axios.isAxiosError(error) && error.response?.status === 409
-          ? 'This topic is no longer available. Choose another topic.'
-          : 'Could not publish the video. Try again.',
-      );
+      setErrorMessage(videoPublishError(error));
     } finally {
       setIsPosting(false);
     }

@@ -11,6 +11,7 @@ const AdminStudio = dynamic(
       { schemaTypes },
       { topicDocumentOptions, topicStructure },
       { default: topicSchema },
+      { default: BulkUpload },
     ] = await Promise.all([
       import('sanity'),
       import('sanity/structure'),
@@ -18,6 +19,7 @@ const AdminStudio = dynamic(
       import('../../../sanity/schemas'),
       import('../topic-structure'),
       import('../topic-schema'),
+      import('../BulkUpload'),
     ]);
 
     const config = defineConfig({
@@ -27,6 +29,7 @@ const AdminStudio = dynamic(
       projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
       dataset: 'production',
       plugins: [structureTool({ structure: topicStructure }), visionTool()],
+      tools: [{ name: 'bulk-upload', title: 'Bulk Upload', component: BulkUpload }],
       document: topicDocumentOptions,
       schema: { types: [...schemaTypes, topicSchema] },
     });

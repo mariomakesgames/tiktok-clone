@@ -16,6 +16,7 @@ import {
 type Data = {
   data?: Video[];
   message?: string;
+  id?: string;
 };
 
 export default async function handler(
@@ -53,7 +54,7 @@ export default async function handler(
       return res.status(400).json({ message: 'Invalid video upload.' });
     }
 
-    await sanityWriter().createIfNotExists({
+    const post = await sanityWriter().createIfNotExists({
       _id: `post-${userId}-${pathname.split('/').pop()?.split('.')[0]}`,
       _type: 'post',
       caption: caption.trim(),
@@ -63,6 +64,6 @@ export default async function handler(
       videoUrl: blob.url,
     });
 
-    res.status(201).json({ message: 'Posted successfully' });
+    res.status(201).json({ id: post._id, message: 'Posted successfully' });
   }
 }
