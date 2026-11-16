@@ -1,5 +1,6 @@
 export const VIDEO_CONTENT_TYPES = ['video/mp4', 'video/webm'];
-export const MAX_VIDEO_BYTES = 10 * 1024 * 1024;
+export const MAX_VIDEO_MB = 30;
+export const MAX_VIDEO_BYTES = MAX_VIDEO_MB * 1024 * 1024;
 
 export function isOwnedVideoPath(pathname: string, userId: string) {
   const prefix = `videos/${userId}/`;

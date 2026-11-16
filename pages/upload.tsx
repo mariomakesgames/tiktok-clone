@@ -3,7 +3,11 @@ import { FaCloudUploadAlt } from 'react-icons/fa';
 import SelectTopic from '../components/SelectTopic';
 import { upload } from '@vercel/blob/client';
 import { nanoid } from 'nanoid';
-import { MAX_VIDEO_BYTES, VIDEO_CONTENT_TYPES } from '../utils/video-upload';
+import {
+  MAX_VIDEO_BYTES,
+  MAX_VIDEO_MB,
+  VIDEO_CONTENT_TYPES,
+} from '../utils/video-upload';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -40,7 +44,7 @@ export default function Upload() {
       return;
     }
     if (!selectedFile.size || selectedFile.size > MAX_VIDEO_BYTES) {
-      setErrorMessage('Video must be between 1 byte and 10 MB.');
+      setErrorMessage(`Video must be between 1 byte and ${MAX_VIDEO_MB} MB.`);
       return;
     }
 
@@ -160,7 +164,7 @@ export default function Upload() {
                   <p className='mb-2 text-sm'>MP4 or WebM</p>
                   <p className='mb-2 text-sm'>720x1280 resolution or higher</p>
                   <p className='mb-2 text-sm'>Up to 30 minutes</p>
-                  <p className='mb-6 text-sm'>Up to 10 MB</p>
+                  <p className='mb-6 text-sm'>Up to {MAX_VIDEO_MB} MB</p>
                   <p className='btn-primary w-4/5 py-2 text-center'>
                     Select file
                   </p>
